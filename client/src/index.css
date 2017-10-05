@@ -1,0 +1,57 @@
+body {
+  background: #ebeef2;
+}
+
+.container {
+  font-family: Verdana, sans-serif;
+  color: #4d4d4d;
+  font-size: 12px;
+  background: #ebeff2;
+  padding: 40px;
+  width: 80%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.meter-chart,
+.area-graph {
+  background: #ffffff;
+  border-bottom: 5px solid #4d4d4d;
+}
+
+.area-graph {
+  margin-top: 2.5%;
+}
+
+.header {
+  font-family: "Oswald Regular", Impact, Verdana, sans-serif;
+  text-transform: uppercase;
+  color: #fff;
+  background: #364150;
+  padding: 20px;
+  font-size: 2em;
+  margin: 20px 0;
+  margin-top: 5px;
+}
+
+.chart-header {
+  padding: 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #4d4d4d;
+  font-size: 2em;
+  font-family: "Oswald Regular", Impact, Verdana, sans-serif;
+}
+
+.header .fa {
+  padding-right: 9px;
+}
+
+.recharts-wrapper {
+  margin: auto;
+  background: #ffffff;
+}
+
+.recharts-responsive-container {
+  margin-top: 1.5%;
+}
