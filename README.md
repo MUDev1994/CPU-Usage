@@ -26,4 +26,4 @@ CPU Usage is an analytic dashboard app that provides anyone with the insights of
 
 
 
-![alt text]()
+![alt text](https://raw.githubusercontent.com/askflow1111/CPU-Usage/master/client/public/screenshot.png)
