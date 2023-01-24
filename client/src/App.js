@@ -14,7 +14,7 @@ class App extends Component {
   }
 
   fetchData() {
-    fetch("http://localhost:3001/")
+    fetch("/api")
       .then(response => {
         return response.json();
       })

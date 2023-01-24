@@ -1,13 +1,15 @@
 const express = require("express");
 const app = express();
 const cors = require('cors');
+const path = require("path");
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, function () {
   console.log(`listening on port ${PORT}`);
 });
 
 app.use(cors());
+app.use(express.static(path.join(__dirname, "client/build")));
 
 let intervalStarted = false;
 const os = require("os");
@@ -46,7 +48,7 @@ function startInterval() {
     startTimes = endTimes;
   }, 1000);
 }
-app.get("/", function (req, res) {
+app.get("/api", function (req, res) {
   if (!intervalStarted) {
     startInterval();
     intervalStarted = true;
@@ -61,7 +63,5 @@ app.get("/", function (req, res) {
 });
 
 app.get("*", function (req, res) {
-  res.status(404).send({
-    message: "Oops! Not found."
+    res.sendFile(path.join(__dirname, "client/build", "index.html"));
   });
-});
