@@ -9,7 +9,6 @@ app.listen(PORT, function () {
 });
 
 app.use(cors());
-app.use(express.static(path.join(__dirname, "client/build")));
 
 let intervalStarted = false;
 const os = require("os");
@@ -61,6 +60,8 @@ app.get("/api", function (req, res) {
     },
   });
 });
+
+app.use(express.static(path.join(__dirname, "client/build")));
 
 app.get("*", function (req, res) {
     res.sendFile(path.join(__dirname, "client/build", "index.html"));
