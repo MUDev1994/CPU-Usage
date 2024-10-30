@@ -26,4 +26,4 @@ CPU Usage is an analytic dashboard app that provides anyone with the insights of
 
 
 
-![alt text](https://raw.githubusercontent.com/BestMUsman/CPU-Usage/master/client/public/screenshot.png)
+![alt text](https://raw.githubusercontent.com/MUDev1994/CPU-Usage/master/client/public/screenshot.png)
