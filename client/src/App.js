@@ -1,47 +1,36 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import MeterChart from "./components/MeterChart";
 import AreaGraph from "./components/AreaGraph";
+import FullScreenLoader from "./components/FullScreenLoader";
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      seconds: 1,
-      avgValue: 0,
-    };
-    this.fetchData = this.fetchData.bind(this);
-  }
+const App = () => {
+  const [seconds, setSeconds] = useState(1);
+  const [avgValue, setAvgValue] = useState(0);
+  const [hasFetchedData, setHasFetchedData] = useState(false);
 
-  fetchData() {
-    fetch("/api")
-      .then(response => {
-        return response.json();
-      })
-      .then(responseJson => {
-        this.setState({
-          avgValue: responseJson.data.avg,
-          seconds: this.state.seconds + 1,
+  useEffect(() => {
+    const fetchData = () => {
+      fetch("https://cpuusage.onrender.com/api")
+        .then((response) => response.json())
+        .then((data) => {
+          setHasFetchedData(true);
+          setAvgValue(data?.data?.averageCpuUsage);
+          setSeconds((prev) => prev + 1);
         });
-      });
-  }
+    };
+    const interval = setInterval(fetchData, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  componentDidMount() {
-    setInterval(this.fetchData, 1000);
-  }
-
-  render() {
-    return (
-      <div className="container">
-        <Header />
-        <MeterChart avgValue={this.state.avgValue} />
-        <AreaGraph
-          avgValue={this.state.avgValue}
-          seconds={this.state.seconds}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div className="container">
+      {!hasFetchedData && <FullScreenLoader />}
+      <Header />
+      <MeterChart avgValue={avgValue} />
+      <AreaGraph avgValue={avgValue} seconds={seconds} />
+    </div>
+  );
+};
 
 export default App;

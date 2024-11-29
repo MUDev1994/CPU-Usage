@@ -1,68 +1,79 @@
 const express = require("express");
-const app = express();
-const cors = require('cors');
+const cors = require("cors");
 const path = require("path");
+const os = require("os");
 
+const app = express();
 const PORT = process.env.PORT || 3002;
-app.listen(PORT, function () {
-  console.log(`listening on port ${PORT}`);
+let isIntervalRunning = false;
+let averageCpuUsage = 0;
+const smoothingFactor = 2;
+
+// Middleware setup
+app.use(cors());
+app.use(express.static(path.join(__dirname, "client/build")));
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
 });
 
-app.use(cors());
+// Function to calculate CPU average
+function calculateCpuAverage() {
+  const cpus = os.cpus();
+  let totalIdle = 0;
+  let totalTick = 0;
 
-let intervalStarted = false;
-const os = require("os");
-let avg = 0;
-let n = 2;
-
-function cpuAverage() {
-  let totalIdle = 0,
-    totalTick = 0;
-  let cpus = os.cpus();
-
-  for (let i = 0, len = cpus.length; i < len; i++) {
-    let cpu = cpus[i];
-    for (type in cpu.times) {
-      totalTick += cpu.times[type];
+  cpus.forEach(cpu => {
+    for (const timeType in cpu.times) {
+      totalTick += cpu.times[timeType];
     }
     totalIdle += cpu.times.idle;
-  }
+  });
 
   return {
     idle: totalIdle / cpus.length,
-    total: totalTick / cpus.length
+    total: totalTick / cpus.length,
   };
 }
 
-let startTimes = cpuAverage();
+// Initialize CPU average
+let previousCpuTimes = calculateCpuAverage();
 
-function startInterval() {
-  setInterval(function () {
-    let endTimes = cpuAverage();
-    let idleDelta = endTimes.idle - startTimes.idle;
-    let totalDelta = endTimes.total - startTimes.total;
-    let percentageCPU = 100 - ~~(100 * idleDelta / totalDelta);
-    avg = parseFloat((avg + (percentageCPU - avg) / n).toFixed(2));
-    console.log(avg + "% CPU Usage.");
-    startTimes = endTimes;
+// Function to start the CPU usage interval
+function monitorCpuUsage() {
+  setInterval(() => {
+    const currentCpuTimes = calculateCpuAverage();
+    const idleDifference = currentCpuTimes.idle - previousCpuTimes.idle;
+    const totalDifference = currentCpuTimes.total - previousCpuTimes.total;
+    const currentCpuUsage = 100 - Math.floor((100 * idleDifference) / totalDifference);
+
+    // Smooth out the average using exponential moving average
+    averageCpuUsage = parseFloat(
+      (averageCpuUsage + (currentCpuUsage - averageCpuUsage) / smoothingFactor).toFixed(2)
+    );
+
+    console.log(`CPU Usage: ${averageCpuUsage}%`);
+    previousCpuTimes = currentCpuTimes;
   }, 1000);
 }
-app.get("/api", function (req, res) {
-  if (!intervalStarted) {
-    startInterval();
-    intervalStarted = true;
+
+// API endpoint to get the current CPU usage average
+app.get("/api", (req, res) => {
+  if (!isIntervalRunning) {
+    monitorCpuUsage();
+    isIntervalRunning = true;
   }
 
   res.json({
     message: "ok",
     data: {
-      avg
+      averageCpuUsage,
     },
   });
 });
 
-app.use(express.static(path.join(__dirname, "client/build")));
-
-app.get("*", function (req, res) {
-    res.sendFile(path.join(__dirname, "client/build", "index.html"));
-  });
+// Catch-all route to serve the client application
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build", "index.html"));
+});

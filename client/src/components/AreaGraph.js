@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -9,90 +9,53 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-class AreaGraph extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      avgArr: [
-        { name: "1s" },
-        { name: "2s" },
-        { name: "3s" },
-        { name: "4s" },
-        { name: "5s" },
-      ],
-      seconds: this.props.seconds,
-    };
-    this.updateData = this.updateData.bind(this);
-  }
+const AreaGraph = ({ avgValue, seconds }) => {
+  const [avgArr, setAvgArr] = useState(
+    Array.from({ length: 5 }, (_, i) => ({ name: `${i + 1}s`, Percent: 0 }))
+  );
 
-  updateData() {
-    if (this.props.seconds < 6) {
-      let newAvgArr = this.state.avgArr.slice();
-      newAvgArr[this.props.seconds - 1].Percent = this.props.avgValue;
-      this.setState({ avgArr: newAvgArr });
-    } else {
-      if (this.state.avgArr.length >= 5) {
-        this.setState({
-          avgArr: this.state.avgArr.slice(1, this.state.avgArr.length + 1),
-        });
+  useEffect(() => {
+    setAvgArr(prevArr => {
+      if (seconds <= 5) {
+        const updatedArr = [...prevArr];
+        updatedArr[seconds - 1] = { name: `${seconds}s`, Percent: avgValue };
+        return updatedArr;
       }
 
-      this.setState(prevState => ({
-        avgArr: [
-          ...prevState.avgArr,
-          { name: this.props.seconds + "s", Percent: this.props.avgValue },
-        ],
-      }));
-    }
-  }
+      const newEntry = { name: `${seconds}s`, Percent: avgValue };
+      const isDuplicate = prevArr[prevArr.length - 1]?.name === newEntry.name;
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.seconds !== this.props.seconds;
-  }
+      return isDuplicate
+        ? prevArr
+        : [...prevArr.slice(1), newEntry];
+    });
+  }, [seconds, avgValue]);
 
-  componentDidUpdate(prevProps, prevState) {
-    this.updateData();
-    if (prevProps.seconds === this.props.seconds) {
-      console.log(prevProps.seconds, "prevProps.seconds");
-      console.log(this.props.seconds, "this.props.seconds");
-    }
-  }
-
-  componentDidMount() {
-    this.updateData();
-  }
-
-  render() {
-    return (
-      <div className="area-graph">
-        <div className="chart-header">Area Chart</div>
-        <ResponsiveContainer minHeight={300}>
-          <AreaChart
-            width={700}
-            height={450}
-            data={this.state.avgArr}
-            margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
-          >
-            <XAxis dataKey="name" stroke="#4e4e4e" />
-            <YAxis
-              ticks={[0, 20, 40, 60, 80, 100]}
-              domain={[0, 100]}
-              stroke="#4e4e4e"
-            />
-            <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-            <Tooltip />
-            <Area
-              type="monotone"
-              dataKey="Percent"
-              stroke="#5b5b60"
-              fill="#cacbce"
-              activeDot={{ r: 6 }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="area-graph">
+      <div className="chart-header">Area Chart</div>
+      <ResponsiveContainer minHeight={300}>
+        <AreaChart
+          width={700}
+          height={450}
+          data={avgArr}
+          margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
+        >
+          <XAxis dataKey="name" stroke="#4e4e4e" />
+          <YAxis ticks={[0, 20, 40, 60, 80, 100]} domain={[0, 100]} stroke="#4e4e4e" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+          <Tooltip />
+          <Area
+            type="monotone"
+            dataKey="Percent"
+            stroke="#5b5b60"
+            fill="#cacbce"
+            activeDot={{ r: 6 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
 
 export default AreaGraph;
