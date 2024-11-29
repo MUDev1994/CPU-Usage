@@ -6,7 +6,7 @@ const os = require("os");
 const app = express();
 const PORT = process.env.PORT || 3002;
 let isIntervalRunning = false;
-let averageCpuUsage = 0;
+let avg = 0;
 const smoothingFactor = 2;
 
 // Middleware setup
@@ -49,11 +49,11 @@ function monitorCpuUsage() {
     const currentCpuUsage = 100 - Math.floor((100 * idleDifference) / totalDifference);
 
     // Smooth out the average using exponential moving average
-    averageCpuUsage = parseFloat(
-      (averageCpuUsage + (currentCpuUsage - averageCpuUsage) / smoothingFactor).toFixed(2)
+    avg = parseFloat(
+      (avg + (currentCpuUsage - avg) / smoothingFactor).toFixed(2)
     );
 
-    console.log(`CPU Usage: ${averageCpuUsage}%`);
+    console.log(`CPU Usage: ${avg}%`);
     previousCpuTimes = currentCpuTimes;
   }, 1000);
 }
@@ -68,7 +68,7 @@ app.get("/api", (req, res) => {
   res.json({
     message: "ok",
     data: {
-      averageCpuUsage,
+      avg,
     },
   });
 });

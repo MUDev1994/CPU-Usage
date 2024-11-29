@@ -15,7 +15,7 @@ const App = () => {
         .then((response) => response.json())
         .then((data) => {
           setHasFetchedData(true);
-          setAvgValue(data?.data?.averageCpuUsage);
+          setAvgValue(data?.data?.avg);
           setSeconds((prev) => prev + 1);
         });
     };
