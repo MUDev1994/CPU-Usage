@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/CPU-Usage/static/css/main.5f298355.css",
+    "main.js": "/CPU-Usage/static/js/main.b7cc064d.js",
+    "index.html": "/CPU-Usage/index.html",
+    "main.5f298355.css.map": "/CPU-Usage/static/css/main.5f298355.css.map",
+    "main.b7cc064d.js.map": "/CPU-Usage/static/js/main.b7cc064d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5f298355.css",
+    "static/js/main.b7cc064d.js"
+  ]
+}
